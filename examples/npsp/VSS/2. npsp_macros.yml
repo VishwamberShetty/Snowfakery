@@ -1,0 +1,40 @@
+# This macro file provides shortcuts to centralize some of the more complex
+# objects and repeative tasks. It is focused on Objects from the NPSP package.
+# Standard Salesforce Objects are generated with macros in a file dedicated to
+# them.
+- include_file: sf_standard_macros.yml # Loads the standard object macros.
+
+# A macro is a lot like any other object definition.
+- macro: Standard npsp__General_Accounting_Unit__c
+  fields:
+    Name: <<fake.word>> Sponsorship # This macro treats the GAUs as a label, but you can add more fields if you need more careful processing.
+- macro: Standard npe01__OppPayment__c
+  fields:
+    npe01__Payment_Date__c: # We are making all the payments in the last week. You'll see this date range a bunch in this file.
+      date_between:
+        start_date: -7d
+        end_date: today
+    # This will also evaluate to true given the payment dates, but I left it to show how you can do calculations based on generated field values.
+    npe01__Paid__c: <<False if this.npe01__Payment_Date__c > today else True>>
+    npsp__Payment_Acknowledgment_Status__c: # This be dependent on Paid
+      random_choice:
+        - To Be Acknowledged
+        - Acknowledged
+        - Do Not Acknowledge
+    npsp__Payment_Acknowledged_Date__c:
+      date_between:
+        start_date: <<this.npe01__Payment_Date__c>>
+        end_date: today
+    npe01__Check_Reference_Number__c:
+      random_number:
+        min: 1000000
+        max: 10000000
+    npe01__Payment_Method__c:
+      random_choice:
+        - Cash
+        - Cheque
+        - Credit Card
+    npe01__Scheduled_Date__c:
+      date_between:
+        start_date: -7d
+        end_date: +7d
