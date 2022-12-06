@@ -1,0 +1,70 @@
+# Snowfakery Recipe to generate data for a specific project that uses NPSP.
+# This recipe will generate 30 accounts with gifts using NPSP standard patterns. Yes, you can make the 30 a parameter,
+# but the goal here is simple for first time users. Gift yourself homework of making that a variable. This recipe also
+# assumes that you need payment records but are not automatically generating those in NPSP settings.
+
+# Load the NPSP macros (which in turn load marcos for SF Standard objects).
+- include_file: npsp_macros.yml
+
+# Create an Account using the SF Standard Object macro loaded in the previous line.
+- object: Account
+  include: SFStandardAccount # This is what generates the Account object itself from that macro.
+  count: <<30 * 0.20>> # 20% of the Accounts are for Companies
+  fields:
+    RecordType: Organization
+  friends: # Create the gift to from this new company.
+    - object: Opportunity
+      include: SFStandardOpportunity
+      fields:
+        Name: Opportunity relating to <<Account.Name>>
+        AccountId:
+          reference: Account
+        # This is a custom field. Either remove this or add the field to get to work for your org. It's here as an example.
+        Ready_to_Post__c: True
+        CampaignId: # This recipe assumes that the campaigns the associate with the gift already exist and you just want them randomly assigned.
+          random_choice: # don't get too exicited by these values, they are copy pasted from a Trailhead org.
+            - 701f40000012C7zAAE
+            - 701f40000012C7xAAE
+            - 701f40000012C7yAAE
+      friends: # Create the payment for the gift.
+        - object: npe01__OppPayment__c
+          include: Standard npe01__OppPayment__c
+          fields:
+            npe01__Opportunity__c:
+              reference: Opportunity
+            npe01__Payment_Amount__c: <<Opportunity.Amount>> # Notice we're pulling in the gift amount here.  You could also do multiple payments and split the amounts.
+
+# The 80% of the gifts will come from Households.
+- object: Account
+  include: SFStandardAccount
+  count: <<30 * 0.80>>
+  fields:
+    Name: <<fake.last_name>> Household # Corrected to match household naming convention.
+    RecordType: HH_Account
+  friends:
+    - object: Contact # Add the contact to the household.
+      include: SFStandardContact
+      count: 1 # These are one person households, but you could add another person here.
+      fields: # Here we're tweaking some details that cam from the macro that aren't what we want.
+        Title: None
+        AccountId:
+          reference: Account
+    - object: Opportunity # Add the household's gift. From here on, the is the same as above (but doesn't need to be).
+      include: SFStandardOpportunity
+      fields:
+        Name: Opportunity relating to <<Account.Name>>
+        AccountId:
+          reference: Account
+        Ready_to_Post__c: True
+        CampaignId:
+          random_choice:
+            - 701f40000012C7zAAE
+            - 701f40000012C7xAAE
+            - 701f40000012C7yAAE
+      friends:
+        - object: npe01__OppPayment__c
+          include: Standard npe01__OppPayment__c
+          fields:
+            npe01__Opportunity__c:
+              reference: Opportunity
+            npe01__Payment_Amount__c: <<Opportunity.Amount>>
