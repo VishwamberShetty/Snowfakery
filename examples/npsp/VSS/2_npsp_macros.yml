@@ -2,7 +2,7 @@
 # objects and repeative tasks. It is focused on Objects from the NPSP package.
 # Standard Salesforce Objects are generated with macros in a file dedicated to
 # them.
-- include_file: sf_standard_macros.yml # Loads the standard object macros.
+- include_file: 3_sf_standard_macros.yml # Loads the standard object macros.
 
 # A macro is a lot like any other object definition.
 - macro: Standard npsp__General_Accounting_Unit__c

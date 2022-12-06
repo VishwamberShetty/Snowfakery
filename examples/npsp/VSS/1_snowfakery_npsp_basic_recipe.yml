@@ -4,7 +4,7 @@
 # assumes that you need payment records but are not automatically generating those in NPSP settings.
 
 # Load the NPSP macros (which in turn load marcos for SF Standard objects).
-- include_file: npsp_macros.yml
+- include_file: 2_npsp_macros.yml
 
 # Create an Account using the SF Standard Object macro loaded in the previous line.
 - object: Account
